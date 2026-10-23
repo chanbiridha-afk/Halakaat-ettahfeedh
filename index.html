@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متابعة مسار الحفظ</title>
+<meta name="theme-color" content="#0d5c4f"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f1e8;--sf:#fff;--tx:#17302b;--mu:#5d6f69;--pr:#0d5c4f;--pt:#fff;--go:#b8892b;--bd:#d5d9cf;--bad:#a8341f;--ok:#1d7a4a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0e1b18;--sf:#16282a;--tx:#e7efe9;--mu:#9bb0a8;--pr:#3fb59f;--pt:#06201b;--go:#e0b45a;--bd:#2b4440;--bad:#ff8a73;--ok:#6fd49b}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0e1b18;--sf:#16282a;--tx:#e7efe9;--mu:#9bb0a8;--pr:#3fb59f;--pt:#06201b;--go:#e0b45a;--bd:#2b4440;--bad:#ff8a73;--ok:#6fd49b}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.7 Cairo,Tahoma,sans-serif}
+header{background:var(--pr);color:var(--pt);padding:14px 16px;border-bottom:4px solid var(--go)}
+h1{margin:0;font:700 24px Amiri,'Times New Roman',serif}
+header p{margin:0;font-size:13px;opacity:.85}
+main{max-width:980px;margin:auto;padding:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--bd);margin-bottom:12px}
+.tabs button{border:0;background:none;color:var(--mu);padding:8px 12px;font:600 15px Cairo,sans-serif;white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent}
+.tabs button.on{color:var(--pr);border-color:var(--go)}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px}
+h2{margin:0 0 8px;font:700 20px Amiri,serif;color:var(--pr)}
+input,select,button,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;max-width:100%}
+button.p{background:var(--pr);color:var(--pt);border-color:var(--pr);cursor:pointer;font-weight:600}
+button.d{color:var(--bad);cursor:pointer}
+label{display:block;font-size:13px;color:var(--mu)}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;align-items:end}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{border:1px solid var(--bd);padding:5px 7px;text-align:center}
+th{background:var(--pr);color:var(--pt)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.k div{border:1px solid var(--bd);border-radius:8px;padding:8px;text-align:center}
+.k b{display:block;font:700 22px Amiri,serif;color:var(--pr)}
+.t{display:inline-block;padding:0 8px;border-radius:99px;background:var(--go);color:#1b1500;font-size:13px}
+.bad{color:var(--bad)}.ok{color:var(--ok)}
+.em{color:var(--mu);text-align:center;padding:16px}
+#rep{display:none}
+@media print{body>header,.bar,.tabs,#v>:not(#rep),.np{display:none!important}#rep{display:block!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header><h1>متابعة مسار الحفظ</h1><p>القرآن الكريم كاملًا — من سورة الفاتحة إلى سورة الناس</p></header>
+<main>
+<div class="bar"><select id="ls" aria-label="المتعلم"></select><button class="p" id="addL">+ متعلم جديد</button><button class="d" id="delL">حذف المتعلم</button></div>
+<div class="tabs" id="tabs"></div>
+<div id="v"></div>
+</main>
+<script>
+const S=[["الفاتحة",7],["البقرة",286],["آل عمران",200],["النساء",176],["المائدة",120],["الأنعام",165],["الأعراف",206],["الأنفال",75],["التوبة",129],["يونس",109],["هود",123],["يوسف",111],["الرعد",43],["إبراهيم",52],["الحجر",99],["النحل",128],["الإسراء",111],["الكهف",110],["مريم",98],["طه",135],["الأنبياء",112],["الحج",78],["المؤمنون",118],["النور",64],["الفرقان",77],["الشعراء",227],["النمل",93],["القصص",88],["العنكبوت",69],["الروم",60],["لقمان",34],["السجدة",30],["الأحزاب",73],["سبأ",54],["فاطر",45],["يس",83],["الصافات",182],["ص",88],["الزمر",75],["غافر",85],["فصلت",54],["الشورى",53],["الزخرف",89],["الدخان",59],["الجاثية",37],["الأحقاف",35],["محمد",38],["الفتح",29],["الحجرات",18],["ق",45],["الذاريات",60],["الطور",49],["النجم",62],["القمر",55],["الرحمن",78],["الواقعة",96],["الحديد",29],["المجادلة",22],["الحشر",24],["الممتحنة",13],["الصف",14],["الجمعة",11],["المنافقون",11],["التغابن",18],["الطلاق",12],["التحريم",12],["الملك",30],["القلم",52],["الحاقة",52],["المعارج",44],["نوح",28],["الجن",28],["المزمل",20],["المدثر",56],["القيامة",40],["الإنسان",31],["المرسلات",50],["النبأ",40],["النازعات",46],["عبس",42],["التكوير",29],["الانفطار",19],["المطففين",36],["الانشقاق",25],["البروج",22],["الطارق",17],["الأعلى",19],["الغاشية",26],["الفجر",30],["البلد",20],["الشمس",15],["الليل",21],["الضحى",11],["الشرح",8],["التين",8],["العلق",19],["القدر",5],["البينة",8],["الزلزلة",8],["العاديات",11],["القارعة",11],["التكاثر",8],["العصر",3],["الهمزة",9],["الفيل",5],["قريش",4],["الماعون",7],["الكوثر",3],["الكافرون",6],["النصر",3],["المسد",5],["الإخلاص",4],["الفلق",5],["الناس",6]];
+const TY=['جوار الدرس','مراجعة القريب','مراجعة القديم'],ST=['تم','تأجيل'],LI=['الأستاذ','الولي','الزميل'],QL=['جيد','متوسط','ضعيف'],QN=['تثبيت','ربط','إعادة حفظ'];
+const D0=['d','اليوم والتاريخ','date'],Q0=['q','المقدار','q'],N0=['n','الملاحظات','txt'],S0=['st','الإنجاز',ST],T0=['ty','نوع الدرس',TY];
+const F={new:[D0,T0,Q0,N0,S0],mush:[D0,T0,Q0,['li','المستمع',LI],['er','الأخطاء','num'],['ti','التنبيهات','num'],N0,S0],qual:[D0,Q0,['ql','جودة الحفظ',QL],['n','الملاحظات',QN]]};
+const TT={new:'الدرس الجديد',mush:'المعاهدة',qual:'متابعة جودة الحفظ'};
+const TABS=[['info','معلومات المتعلم'],['new','الدرس الجديد'],['mush','المعاهدة'],['qual','جودة الحفظ'],['wird','الورد الأسبوعي'],['rep','التقرير الشهري'],['bk','نسخ واستيراد']];
+const KEY='hifz_followup_v1',DAYS=['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+let D=null;try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!D||!D.l)D={l:[],cur:null};
+let tab='info',month=new Date().toISOString().slice(0,7);
+const $=i=>document.getElementById(i),today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+const cur=()=>D.l.find(x=>x.id===D.cur);
+const qs=r=>S[r.s][0]+' ('+r.f+'–'+r.t+')';
+function mem(l){const m=[];(l.new||[]).forEach(r=>{if(r.st!=='تم')return;m[r.s]=m[r.s]||new Set();for(let i=r.f;i<=r.t;i++)m[r.s].add(i)});return m}
+function memTotal(l){return mem(l).reduce((a,s)=>a+(s?s.size:0),0)}
+function cat(n){return n>=6236?'حافظ للقرآن كله':n>=2000?'متقن':n>=600?'متقدم':n>=150?'متوسط':'مبتدئ'}
+function age(bd){if(!bd)return'—';const b=new Date(bd),n=new Date();let m=(n.getFullYear()-b.getFullYear())*12+n.getMonth()-b.getMonth();if(n.getDate()<b.getDate())m--;return m<0?'—':Math.floor(m/12)+' سنة و '+m%12+' شهر'}
+function runs(a){const o=[];let s=a[0],p=a[0];for(let i=1;i<=a.length;i++){if(a[i]!==p+1){o.push(s===p?s:s+'–'+p);s=a[i]}p=a[i]}return o.join('، ')}
+function render(){
+ $('ls').innerHTML=D.l.map(l=>`<option value="${l.id}" ${l.id===D.cur?'selected':''}>${esc(l.name)}</option>`).join('')||'<option>لا يوجد متعلمون</option>';
+ $('tabs').innerHTML=TABS.map(t=>`<button class="${t[0]===tab?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+ const l=cur();
+ if(!l&&tab!=='bk'){$('v').innerHTML='<div class="card em">ابدأ بإضافة متعلم جديد من الزر أعلاه.</div>';return}
+ $('v').innerHTML=tab==='bk'?backup():tab==='info'?info(l):tab==='wird'?wird(l):tab==='rep'?report(l):sect(l,tab);
+}
+function info(l){const n=memTotal(l),ns=mem(l).filter(Boolean).length;
+ return `<div class="card"><h2>بيانات المتعلم</h2><div class="g">
+ <label>اسم المتعلم<input data-f="name" value="${esc(l.name)}"></label>
+ <label>المستوى الدراسي (حدّثه عند الانتقال)<input data-f="level" value="${esc(l.level)}" list="lv"></label>
+ <label>تاريخ الميلاد<input type="date" data-f="bd" value="${esc(l.bd)}"></label>
+ <label>مكان الميلاد<input data-f="bp" value="${esc(l.bp)}"></label></div>
+ <datalist id="lv"><option>الأول ابتدائي<option>الثاني ابتدائي<option>الثالث ابتدائي<option>الرابع ابتدائي<option>الخامس ابتدائي<option>السادس ابتدائي<option>الأول متوسط<option>الثاني متوسط<option>الثالث متوسط<option>الرابع متوسط<option>الأول ثانوي<option>الثاني ثانوي<option>الثالث ثانوي</datalist></div>
+ <div class="k"><div><b>${age(l.bd)}</b>العمر (يتحدّث تلقائيًا)</div><div><b>${n}</b>آية محفوظة</div><div><b>${ns}</b>سورة (كلية أو جزئية)</div><div><b>${cat(n)}</b>الفئة</div></div>
+ <p class="np" style="color:var(--mu);font-size:13px">الفئة حسب المحفوظ المسجّل «تم» في الدرس الجديد: مبتدئ أقل من 150 آية، متوسط 150، متقدم 600، متقن 2000، وحافظ للقرآن كله عند 6236 آية.</p>`}
+function formRow(k,ls){return F[k].map(([id,lb,t])=>{
+ if(t==='q')return `<label>السورة<select id="f_s">${S.map((s,i)=>`<option value="${i}">${s[0]}</option>`).join('')}</select></label><label>من الآية<input type="number" id="f_f" min="1" value="1"></label><label>إلى الآية<input type="number" id="f_t" min="1" value="1"></label>`;
+ const x=Array.isArray(t)?`<select id="f_${id}">${t.map(o=>`<option>${o}</option>`).join('')}</select>`:`<input id="f_${id}" type="${t==='date'?'date':t==='num'?'number':'text'}" ${t==='date'?`value="${today()}"`:t==='num'?'min="0" value="0"':''}>`;
+ return `<label>${lb}${x}</label>`}).join('')}
+function sect(l,k){const rows=(l[k]||[]).slice().sort((a,b)=>b.d<a.d?-1:1);
+ const hd=F[k].map(c=>`<th>${c[1]}</th>`).join('');
+ const tr=rows.map(r=>`<tr>${F[k].map(([id,,t])=>`<td>${t==='q'?esc(qs(r)):esc(r[id])}</td>`).join('')}<td><button class="d" data-del="${r.id}" aria-label="حذف">✕</button></td></tr>`).join('');
+ return `<div class="card np"><h2>إضافة سطر — ${TT[k]}</h2><div class="g">${formRow(k)}<button class="p" data-add="${k}">حفظ السطر</button></div><div id="err" class="bad"></div></div>
+ <div class="card"><h2>${TT[k]}</h2><div class="sc">${rows.length?`<table><tr>${hd}<th></th></tr>${tr}</table>`:'<div class="em">لا توجد أسطر بعد.</div>'}</div></div>`}
+function wird(l){const m=mem(l),all=[];m.forEach((s,i)=>{if(s)[...s].sort((a,b)=>a-b).forEach(a=>all.push([i,a]))});
+ const nd=l.wd||7,u=l.wu||'a',ds=DAYS.slice(0,nd);
+ const ctl=`<div class="card np"><div class="g"><label>عدد أيام الورد<select data-w="wd">${[7,6,5].map(x=>`<option ${x===nd?'selected':''}>${x}</option>`).join('')}</select></label><label>وحدة القياس<select data-w="wu"><option value="a" ${u==='a'?'selected':''}>عدد الآيات</option><option value="p" ${u==='p'?'selected':''}>الصفحات (تقريبًا)</option></select></label><label>طريقة الورد<select data-w="wmode"><option value="a" ${l.wmode!=='m'?'selected':''}>تلقائي متوازن</option><option value="m" ${l.wmode==='m'?'selected':''}>يحدده الأستاذ</option></select></label><button class="p" onclick="window.print()">طباعة</button></div></div>`;
+ if(l.wmode==='m')return ctl+manual(l,ds,u);
+ if(!all.length)return ctl+'<div class="card em">سجّل دروسًا بحالة «تم» في الدرس الجديد ليُبنى الورد تلقائيًا.</div>';
+ const sz=Math.ceil(all.length/nd);let out='';
+ ds.forEach((d,i)=>{const ch=all.slice(i*sz,(i+1)*sz);if(!ch.length)return;const by={};ch.forEach(([s,a])=>(by[s]=by[s]||[]).push(a));
+  const txt=Object.keys(by).map(s=>S[s][0]+' ('+runs(by[s])+')').join(' ، ');
+  out+=`<tr><td><b>${d}</b></td><td style="text-align:right">${esc(txt)}</td><td>${u==='a'?ch.length+' آية':(ch.length/10.3).toFixed(1)+' صفحة'}</td></tr>`});
+ return ctl+`<div class="card"><h2>الورد الأسبوعي — ${esc(l.name)}</h2><p style="color:var(--mu);font-size:13px">يُوزَّع كل المحفوظ بالتساوي على أيام الأسبوع ويتغيّر تلقائيًا مع كل تقدّم (الصفحة ≈ 10 آيات).</p><div class="sc"><table><tr><th>اليوم</th><th>المقدار</th><th>الحجم</th></tr>${out}</table></div></div>`}
+function auto(l){const all=[];mem(l).forEach((s,i)=>{if(s)[...s].sort((a,b)=>a-b).forEach(a=>all.push([i,a]))});const nd=l.wd||7,sz=Math.ceil(all.length/nd)||1,o={};
+ for(let i=0;i<nd;i++){const ch=all.slice(i*sz,(i+1)*sz),by={};ch.forEach(([s,a])=>(by[s]=by[s]||[]).push(a));o[i]=[];Object.keys(by).forEach(s=>{const a=by[s];let st=a[0],p=a[0];for(let k=1;k<=a.length;k++){if(a[k]!==p+1){o[i].push({s:+s,f:st,t:p});st=a[k]}p=a[k]}})}return o}
+function manual(l,ds,u){l.wm=l.wm||{};const op=S.map((s,i)=>`<option value="${i}">${s[0]}</option>`).join('');
+ return `<div class="card"><h2>ورد ${esc(l.name)} — يحدده الأستاذ</h2><p class="np" style="color:var(--mu);font-size:13px">أضف لكل يوم السور والآيات المطلوبة، أو انسخ التوزيع التلقائي ثم عدّله.</p><button class="np" data-seed="1">نسخ التوزيع التلقائي</button><div id="werr" class="bad"></div></div>`+ds.map((d,i)=>{const L=l.wm[i]||[],n=L.reduce((a,r)=>a+r.t-r.f+1,0);
+  return `<div class="card"><b>${d}</b> — ${u==='a'?n+' آية':(n/10.3).toFixed(1)+' صفحة'}<div>${L.map((r,j)=>`<div>${esc(qs(r))} <button class="d np" data-wdel="${i}.${j}">✕</button></div>`).join('')}</div><div class="g np"><select id="ws${i}">${op}</select><input type="number" id="wf${i}" min="1" value="1"><input type="number" id="wt${i}" min="1" value="1"><button class="p" data-wadd="${i}">+ إضافة</button></div></div>`}).join('')}
+function backup(){return `<div class="card"><h2>تصدير البيانات</h2><p style="color:var(--mu);font-size:13px">انسخ النص واحفظه في ملف أو رسالة، ثم الصقه في جهاز آخر للاستيراد.</p><textarea id="bx" readonly rows="5" style="width:100%">${esc(JSON.stringify(D))}</textarea><button class="p" data-bk="copy">نسخ النص</button></div><div class="card"><h2>استيراد البيانات</h2><label>من ملف نصي أو JSON<input type="file" id="bfile" accept=".json,.txt"></label><textarea id="bi" rows="5" style="width:100%" placeholder="أو الصق هنا نص النسخة الاحتياطية"></textarea><div class="bar"><button class="p" data-bk="merge">دمج مع الموجود</button><button class="d" data-bk="repl">استبدال كل البيانات</button></div><div id="bm" class="bad"></div></div>`}
+function report(l){const inM=a=>(a||[]).filter(r=>(r.d||'').startsWith(month));
+ const N=inM(l.new),M=inM(l.mush),Q=inM(l.qual),cnt=(a,v)=>a.filter(r=>r.st===v).length;
+ const nd=cnt(N,'تم'),np=cnt(N,'تأجيل'),md=cnt(M,'تم'),mp=cnt(M,'تأجيل');
+ const er=M.reduce((a,r)=>a+(+r.er||0),0),ti=M.reduce((a,r)=>a+(+r.ti||0),0),days=new Set([...N,...M,...Q].map(r=>r.d)).size;
+ const ay=a=>a.reduce((x,r)=>x+(r.t-r.f+1),0),qc=v=>Q.filter(r=>r.ql===v);
+ const R=[];const tot=N.length+M.length;
+ if(!tot&&!Q.length)R.push('لا توجد أي أسطر مسجّلة هذا الشهر: ابدأ بتسجيل الحصص وحدّد موعدًا ثابتًا للمتابعة.');
+ else{
+  if(days<8)R.push('عدد أيام المتابعة قليل ('+days+' يومًا): يُنصح بالانتظام في أربعة أيام أسبوعيًا على الأقل.');
+  if(N.length&&np/N.length>.25)R.push('نسبة التأجيل في الدرس الجديد مرتفعة ('+Math.round(100*np/N.length)+'٪): خفّض مقدار الدرس الجديد وثبّت ما سبق قبل المتابعة.');
+  if(M.length&&mp/M.length>.25)R.push('تأجيل المعاهدة مرتفع: حدّد وقتًا يوميًا ثابتًا للمراجعة مع المستمع.');
+  if(N.length&&M.length<N.length)R.push('عدد حصص المعاهدة أقل من حصص الدرس الجديد: زد المراجعة لحماية المحفوظ.');
+  if(!M.length&&N.length)R.push('لم تُسجَّل معاهدة هذا الشهر: أضف مراجعة القريب أسبوعيًا على الأقل.');
+  if(M.length&&er/M.length>3)R.push('متوسط الأخطاء في المعاهدة مرتفع ('+(er/M.length).toFixed(1)+' للحصة): ركّز على التثبيت قبل الانتقال لمقطع جديد.');
+  if(qc('ضعيف').length)R.push('مقاطع ضعيفة تحتاج إلى إعادة حفظ: '+[...new Set(qc('ضعيف').map(qs))].join('، ')+'.');
+  if(qc('متوسط').length)R.push('مقاطع متوسطة تحتاج إلى تثبيت وربط: '+[...new Set(qc('متوسط').map(qs))].join('، ')+'.');
+  if(!R.length)R.push('أداء منتظم وجيد هذا الشهر: واصل بالوتيرة نفسها ويمكن زيادة الدرس الجديد تدريجيًا.')}
+ const n=memTotal(l);
+ return `<div class="card np"><div class="g"><label>الشهر<input type="month" id="mo" value="${month}"></label><button class="p" onclick="window.print()">طباعة التقرير</button></div></div>
+ <div id="rep" style="display:block" class="card"><h2>التقرير الشهري — ${esc(l.name)} — ${month}</h2>
+ <p>المستوى: ${esc(l.level||'—')} | العمر: ${age(l.bd)} | الفئة: <span class="t">${cat(n)}</span> | المحفوظ الكلي: ${n} آية</p>
+ <div class="k"><div><b>${days}</b>أيام المتابعة</div><div><b>${ay(N.filter(r=>r.st==='تم'))}</b>آيات الدرس الجديد المنجزة</div><div><b>${nd}/${np}</b>تم / تأجيل (الدرس)</div><div><b>${md}/${mp}</b>تم / تأجيل (المعاهدة)</div><div><b>${er}</b>الأخطاء</div><div><b>${ti}</b>التنبيهات</div></div>
+ <p>جودة الحفظ: جيد ${qc('جيد').length} — متوسط ${qc('متوسط').length} — ضعيف ${qc('ضعيف').length}</p>
+ <h2>التوصيات</h2><ul>${R.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p style="margin-top:28px">اعتماد المشرف: ........................</p></div>`}
+document.addEventListener('click',e=>{const t=e.target,l=cur();
+ if(t.dataset.t){tab=t.dataset.t;render()}
+ if(t.id==='addL'){const nm=prompt('اسم المتعلم');if(nm&&nm.trim()){const x={id:'l'+Date.now(),name:nm.trim(),level:'',bd:'',bp:'',new:[],mush:[],qual:[]};D.l.push(x);D.cur=x.id;save();tab='info';render()}}
+ if(t.id==='delL'&&l&&confirm('حذف «'+l.name+'» وكل بياناته؟')){D.l=D.l.filter(x=>x!==l);D.cur=D.l[0]?D.l[0].id:null;save();render()}
+ if(t.dataset.del&&l){l[tab]=l[tab].filter(r=>r.id!==t.dataset.del);save();render()}
+ if(t.dataset.add&&l){const k=t.dataset.add,r={id:'r'+Date.now()+Math.random().toString(36).slice(2,5)};
+  F[k].forEach(([id,,ty])=>{if(ty==='q'){r.s=+$('f_s').value;r.f=+$('f_f').value;r.t=+$('f_t').value}else r[id]=$('f_'+id).value});
+  const mx=S[r.s][1];
+  if(!r.d){$('err').textContent='اختر التاريخ.';return}
+  if(!(r.f>=1&&r.t>=r.f&&r.t<=mx)){$('err').textContent='رقم الآية غير صحيح: سورة '+S[r.s][0]+' فيها '+mx+' آية، ويجب أن يكون «من» ≤ «إلى».';return}
+  l[k].push(r);save();render()}
+ if(t.dataset.seed&&l&&confirm('سيستبدل هذا الورد اليدوي الحالي. متابعة؟')){l.wm=auto(l);save();render()}
+ if(t.dataset.wdel&&l){const[i,j]=t.dataset.wdel.split('.');l.wm[i].splice(+j,1);save();render()}
+ if(t.dataset.wadd&&l){const i=t.dataset.wadd,s=+$('ws'+i).value,f=+$('wf'+i).value,to=+$('wt'+i).value;if(!(f>=1&&to>=f&&to<=S[s][1])){$('werr').textContent='رقم الآية غير صحيح: سورة '+S[s][0]+' فيها '+S[s][1]+' آية.';return}(l.wm[i]=l.wm[i]||[]).push({s,f,t:to});save();render()}
+ if(t.dataset.bk==='copy'){const x=$('bx');x.select();try{document.execCommand('copy')}catch(_){}}
+ if(t.dataset.bk==='merge'||t.dataset.bk==='repl'){let z;try{z=JSON.parse($('bi').value)}catch(_){}
+  if(!z||!Array.isArray(z.l)){$('bm').textContent='النص غير صالح: الصق النسخة الاحتياطية كاملة.';return}
+  const ok=z.l.filter(x=>x&&x.id&&x.name).map(x=>({new:[],mush:[],qual:[],...x}));
+  if(t.dataset.bk==='repl'){if(!confirm('سيحذف هذا بيانات الجهاز الحالية. متابعة؟'))return;D={l:ok,cur:ok[0]?ok[0].id:null}}
+  else{ok.forEach(x=>{const i=D.l.findIndex(y=>y.id===x.id);i<0?D.l.push(x):D.l[i]=x});if(!D.cur&&D.l[0])D.cur=D.l[0].id}
+  save();tab='info';render()}
+});
+document.addEventListener('change',e=>{const t=e.target,l=cur();
+ if(t.id==='ls'){D.cur=t.value;save();render()}
+ else if(t.id==='mo'){month=t.value||month;render()}
+ else if(t.id==='bfile'){const f=t.files[0];if(f){const r=new FileReader();r.onload=()=>{$('bi').value=r.result};r.readAsText(f)}}
+ else if(t.dataset.f&&l){l[t.dataset.f]=t.value;save();if(t.dataset.f==='bd'||t.dataset.f==='name')render()}
+ else if(t.dataset.w&&l){l[t.dataset.w]=t.dataset.w==='wd'?+t.value:t.value;save();render()}
+});
+if(!D.cur&&D.l[0])D.cur=D.l[0].id;
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
